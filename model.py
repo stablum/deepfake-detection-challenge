@@ -9,15 +9,27 @@ def add_layer(net, *args, **kwargs):
 
 def create():
     net = Sequential()#add model layers
-    add_layer(net,Conv3D(5, kernel_size=7, strides=(2,7,7), activation='elu', input_shape=(config.frames_per_point,1080,1920,3)))
-    add_layer(net,Conv3D(5, kernel_size=7, strides=(2,7,7), activation='elu'))
-    add_layer(net,Conv3D(5, kernel_size=7, strides=(2,7,7), activation='elu'))
+    for i in range(config.conv_layers):
+        kwargs = dict(
+            kernel_size=config.kernel_size, 
+            strides=(
+                config.stride_t,
+                config.stride_xy,
+                config.stride_xy
+            ), 
+            activation=config.conv_activation
+        )
+        if i == 0:
+            kwargs['input_shape'] = (config.frames_per_point,1080,1920,3)
+        add_layer(net,Conv3D(config.conv_features, **kwargs))
     add_layer(net,Flatten())
-    add_layer(net,Dense(10, activation=config.dense_activation))
+    for i in range(config.dense_layers):
+        size = int(config.first_dense_layer/(i+1))
+        add_layer(net,Dense(size, activation=config.dense_activation))
     add_layer(net,Dense(2, activation='softmax'))
 
 
     net.compile(loss='categorical_crossentropy',
-                  optimizer='adam',
+                  optimizer=config.optimizer,
                   metrics=['accuracy'])
     return net
