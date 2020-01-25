@@ -9,6 +9,7 @@ import tqdm
 import config
 import mlflow
 import tempfile
+import keras
 
 def log_config():
     print(dir(config))
@@ -19,12 +20,27 @@ def log_config():
 
 def log_net(net):
     pretty_net = net.to_json(indent=4)
-    filename = tempfile.mkstemp(prefix="deepfake_net_",suffix=".txt")[1]
-    f = open(filename,'w')
+    structure_filename = tempfile.mkstemp(prefix="deepfake_net_structure",suffix=".txt")[1]
+    plot_filename= tempfile.mkstemp(prefix="deepfake_net_plot",suffix=".png")[1]
+    f = open(structure_filename,'w')
     f.write(pretty_net)
     f.flush()
     f.close()
-    mlflow.log_artifact(filename)
+    mlflow.log_artifact(structure_filename)
+    keras.utils.plot_model(
+        net,
+        to_file=plot_filename,
+        show_shapes=True,
+        show_layer_names=True,
+        expand_nested=True
+    )
+    mlflow.log_artifact(plot_filename)
+    summary_filename = tempfile.mkstemp(prefix="deepfake_net_summary",suffix=".txt")[1]
+    f = open(summary_filename,'w')
+    keras.utils.print_summary(net,print_fn=lambda line: f.write(line+'\n'))
+    f.flush()
+    f.close()
+    mlflow.log_artifact(summary_filename)
 
 def read_metadata():
     f = open('train_sample_videos/metadata.json')
