@@ -1,6 +1,6 @@
 points_per_epoch=50
 frames_per_point=15
-dense_activation='sigmoid'
+dense_activation='tanh'
 conv_layers=3
 conv_features=3
 kernel_size=3
@@ -15,5 +15,5 @@ max_pool_first_size_t=1
 max_pool_first_size_xy=4
 first_dense_layer=20
 dense_layers=3
-optimizer='sgd'
+optimizer='adam'
 n_epochs=100
