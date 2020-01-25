@@ -4,8 +4,9 @@ import numpy
 import humanize
 import utils
 def main():
-    for i, point , filename, label in utils.datapoints():
-        utils.print_point(i, point, filename,label)
+    for i, slices, filename, label in utils.datapoints():
+        for curr_slice in slices:
+            utils.print_point(i, curr_slice, filename,label)
 
 if __name__=="__main__":
     main()

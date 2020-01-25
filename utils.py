@@ -18,6 +18,7 @@ def log_config():
         if curr[0] != '_':
             val = getattr(config, curr)
             mlflow.log_param(curr,val)
+    mlflow.log_artifact('config.py')
 
 def log_net(net):
     pretty_net = net.to_json(indent=4)
