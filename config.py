@@ -1,4 +1,4 @@
-points_per_epoch=400
+points_per_epoch=50
 frames_per_point=15
 dense_activation='sigmoid'
 conv_layers=3

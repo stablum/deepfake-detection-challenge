@@ -58,6 +58,7 @@ def slice_videodata(videodata):
     orig_shape = videodata.shape
     # get randomly-positioned chunk of frames
     start_frame = random.randint(1,248)
+    print("start_frame", start_frame)
     shorter = videodata[start_frame:start_frame+config.frames_per_point,:,:,:]
     if orig_shape[1] != 1080:
         ret = np.swapaxes(shorter,1,2)
@@ -70,23 +71,33 @@ def to_grayscale(point):
     return grayscale
 
 def datapoints():
+    #filenames = glob.glob("/mnt/ramdisk/*.mp4")
     filenames = glob.glob("train_sample_videos/*.mp4")
     random.shuffle(filenames) # always load datapoint in different order
     metadata = read_metadata()
     for i, filename in enumerate(tqdm.tqdm(filenames[:config.points_per_epoch])):
         start = time.time()
         videodata = skvideo.io.vread(filename)
-        point = slice_videodata(videodata)
-        #point = to_grayscale(point)
-        #point = np.expand_dims(point,-1)
-        point = np.expand_dims(point,0)
+        end_load = time.time()
+        print("loading time:",end_load-start)
         basename = os.path.basename(filename)
         label_str = metadata[basename]['label']
         if label_str == "FAKE":
             label = np.array([[1,0]])
+            n_slices = 5
         else:
             label = np.array([[0,1]])
+            n_slices = 21
+
+        slices = []
+
+        for _ in range(n_slices):
+            curr = slice_videodata(videodata)
+            #point = to_grayscale(point)
+            #point = np.expand_dims(point,-1)
+            curr = np.expand_dims(curr,0)
+            slices.append(curr)
         end = time.time()
         print("elapsed time to load and process",filename,":",end - start)
-        yield i, point, filename, label
+        yield i,slices, filename, label
 

@@ -16,6 +16,7 @@ def main():
 
 def train(net):
     for epoch in range(config.n_epochs):
+        epoch_start = time.time()
         mlflow.log_metric("epoch",epoch)
         predictions = metrics.predictions(net)
         qu, uq = metrics.avg_error(net, predictions)
@@ -26,14 +27,19 @@ def train(net):
         for cls,corrects in class_corrects.items():
             mlflow.log_metric('class_corrects_'+str(int(cls)),corrects)
 
-        for i, point, filename, label in utils.datapoints():
-            utils.print_point(i, point, filename, label, epoch=epoch)
-            start = time.time()
-            net.fit(point,label, batch_size=1)
-            end = time.time()
-            print("elapsed time to fit:",end - start)
-            classes = net.predict(point, batch_size=1)
-            print("prediction:",classes, "label:",label)
+        fit_times = []
+        for i, slices, filename, label in utils.datapoints():
+            for curr_slice in slices:
+                utils.print_point(i, curr_slice, filename, label, epoch=epoch)
+                start = time.time()
+                net.fit(curr_slice,label, batch_size=1)
+                end = time.time()
+                fit_time = end-start
+                print("elapsed time to fit:",fit_time)
+                fit_times.append(fit_time)
+        epoch_end = time.time()
+        mlflow.log_metric("avg_datapoint_fit_time",np.avg(fit_times))
+        mlflow.log_metric("epoch_mins",(epoch_end-epoch_start)/60.0)
 
 
 if __name__=="__main__":

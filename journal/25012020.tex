@@ -11,10 +11,10 @@ In theory it's possible to learn symmetric matrices (or tensors) by decompositio
 in vectors, each for every dimension.
 
 This is going to be the focus of the second model: every 3D convolution is
-replaced by 3 3D convolution that have kernel dimension set at 1 except for the
+replaced by three 3D convolutions that have kernel dimension set at 1 except for the
 dimension in which the convolution is going to operate.
 
-This way, every ``block'' of convolution is going to have 30 parameters instead of 246.
+This way, every ``block'' of convolutions is going to have 30 parameters instead of 246.
 
 The 'stride' subsampling that was characteristic of every convolutional layer
 in the first model is being set only at the third layer in each block of
@@ -23,12 +23,44 @@ in the first model is being set only at the third layer in each block of
 \subsection{Excessive computation of decomposed convolution layers}
 
 Unfortunately this network, even if it has a lower number of parameters,
-it's much more computationally expensive.
+its still very computationally expensive.
 This is possibly due to the triplication of sweeps on data that has the input 
 dimensionality.
 
 To tackle this problem, a subsampling maxpool layer has been added as input layer to
 have a preliminary dimensionality reduction.
 This follows an observation of genetic algorithm-evolved convolutional neural networks
-that were optimized also by running time. The GA was always puttin a maxpool layer
+that were optimized also by running time.
+Many of the best-fit genotypes selected by the genetic algorithm
+were putting a maxpool layer
 on the input with suprising results also in accuracy of the network.
+
+\subsection{Excessive loading and pre-processing of input videos}
+
+Moreover, loading a single video in tensor form takes about 7 seconds.
+This is not different even using a ramdisk, where all the videos are stored in
+memory instead of on the hard drive.
+
+This issue requires a different strategy. Under the current model configuration,
+just 15 frames are being used over all 300 frames of each video. Considering the
+high loading time of a single video this is quite a waste.
+A better approach could be to load and process multiple 15-frames slices after a video
+has been loaded.
+
+This will cause a stronger ``learning intensity'' per epoch, as multiple calls to
+the fit function will happen for every video.
+
+Memory limits need to be taken into consideration with these changes.
+A 15-frames uncompressed slice requires 93.3 MB. A conservative memory allocation
+can be 2GB, hence about 20 slices can be loaded from a video.
+
+Such changes come very handy also to tackle the class unbalance problem, which can
+be dealt by submitting 5 slices for every fake video and 21 slices for every real
+video, which will amount to the previously reported 4.2 ratio of fake videos / real videos.
+
+By submitting 5 slices for every fake video and 21 slices for every real one, one ``new'' 
+epoch will have processed 3232. Hence, it would be equivalent as $8.08$ epochs in the 
+first model.
+
+To keep a fair comparison with the first model, the amount of videos loaded at every epoch
+will be one eight, i.e. 50 videos.

@@ -4,12 +4,14 @@ import utils
 
 def predictions(net):
     ret = []
-    for i, point, filename, label in utils.datapoints():
-        start = time.time()
-        cls = net.predict(point, batch_size=1)
-        end = time.time()
-        print("elapsed time to predict:",end - start)
-        ret.append((cls[0][0],label[0][0]))
+    for i, slices, filename, label in utils.datapoints():
+        for curr_slice in slices:
+            start = time.time()
+            cls = net.predict(curr_slice, batch_size=1)
+            end = time.time()
+            print("prediction:",cls, "label:",label)
+            print("elapsed time to predict:",end - start)
+            ret.append((cls[0][0],label[0][0]))
     return ret
 
 def avg_error(net,predictions):
