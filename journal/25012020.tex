@@ -64,3 +64,11 @@ first model.
 
 To keep a fair comparison with the first model, the amount of videos loaded at every epoch
 will be one eight, i.e. 50 videos.
+
+\subsection{Changes in activation functions and optimizing method}
+
+The fully connected layers have been added the $\tanh$ activation function.
+The co-domain of the function between -1 and +1 has possibly some advantages.
+Vanishing gradient might still be an issue, hence ELU should be considered in the future.
+
+Adam has been used as optimization method, due to using momentum.

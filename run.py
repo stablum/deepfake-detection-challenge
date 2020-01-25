@@ -42,10 +42,10 @@ def train(net):
                 print("elapsed time to fit:",fit_time)
                 fit_times.append(fit_time)
         epoch_end = time.time()
-        mlflow.log_metric("avg_datapoint_fit_time",np.avg(fit_times))
+        mlflow.log_metric("median_datapoint_fit_time",np.median(fit_times))
         mlflow.log_metric("epoch_mins",(epoch_end-epoch_start)/60.0)
-        mlflow.log_metric("avg_loss",np.avg(losses))
-        mlflow.log_metric("avg_accuracy",np.avg(accuracies))
+        mlflow.log_metric("mean_loss",np.mean(losses))
+        mlflow.log_metric("mean_accuracy",np.mean(accuracies))
 
 
 if __name__=="__main__":
