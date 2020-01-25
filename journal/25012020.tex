@@ -1,0 +1,34 @@
+\section{25/01/2020 : second model}
+
+\subsection{Decomposed kernels}
+
+It's well known that a symmetric matrix can be decomposed in two vector-sized kernels.
+Subsequent convolution with the two (in the case of 2D images) decomposed kernels
+result into the same convolution as the un-decomposed kernel.
+An example is shown in \cite{Sobel}.
+
+In theory it's possible to learn symmetric matrices (or tensors) by decompositions
+in vectors, each for every dimension.
+
+This is going to be the focus of the second model: every 3D convolution is
+replaced by 3 3D convolution that have kernel dimension set at 1 except for the
+dimension in which the convolution is going to operate.
+
+This way, every ``block'' of convolution is going to have 30 parameters instead of 246.
+
+The 'stride' subsampling that was characteristic of every convolutional layer
+in the first model is being set only at the third layer in each block of
+``decomposed'' convolutional layers.
+
+\subsection{Excessive computation of decomposed convolution layers}
+
+Unfortunately this network, even if it has a lower number of parameters,
+it's much more computationally expensive.
+This is possibly due to the triplication of sweeps on data that has the input 
+dimensionality.
+
+To tackle this problem, a subsampling maxpool layer has been added as input layer to
+have a preliminary dimensionality reduction.
+This follows an observation of genetic algorithm-evolved convolutional neural networks
+that were optimized also by running time. The GA was always puttin a maxpool layer
+on the input with suprising results also in accuracy of the network.
