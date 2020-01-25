@@ -4,6 +4,7 @@ import model
 import utils
 import numpy as np
 import mlflow
+import time
 import metrics
 import config
 
@@ -27,7 +28,10 @@ def train(net):
 
         for i, point, filename, label in utils.datapoints():
             utils.print_point(i, point, filename, label, epoch=epoch)
+            start = time.time()
             net.fit(point,label, batch_size=1)
+            end = time.time()
+            print("elapsed time to fit:",end - start)
             classes = net.predict(point, batch_size=1)
             print("prediction:",classes, "label:",label)
 

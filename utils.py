@@ -10,6 +10,7 @@ import config
 import mlflow
 import tempfile
 import keras
+import time
 
 def log_config():
     print(dir(config))
@@ -73,6 +74,7 @@ def datapoints():
     random.shuffle(filenames) # always load datapoint in different order
     metadata = read_metadata()
     for i, filename in enumerate(tqdm.tqdm(filenames[:config.points_per_epoch])):
+        start = time.time()
         videodata = skvideo.io.vread(filename)
         point = slice_videodata(videodata)
         #point = to_grayscale(point)
@@ -84,5 +86,7 @@ def datapoints():
             label = np.array([[1,0]])
         else:
             label = np.array([[0,1]])
+        end = time.time()
+        print("elapsed time to load and process",filename,":",end - start)
         yield i, point, filename, label
 

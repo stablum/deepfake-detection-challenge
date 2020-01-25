@@ -16,9 +16,9 @@ def create():
         if config.max_pool_first and first is True:
             kwargs = dict()
             kwargs['pool_size']=(
-                config.max_pool_size_t, 
-                config.max_pool_size_xy, 
-                config.max_pool_size_xy
+                config.max_pool_first_size_t, 
+                config.max_pool_first_size_xy, 
+                config.max_pool_first_size_xy
             )
             kwargs['input_shape'] = (config.frames_per_point,1080,1920,3)
             add_layer(net,MaxPooling3D(**kwargs))
@@ -63,4 +63,5 @@ def create():
                   optimizer=config.optimizer,
                   metrics=['accuracy'])
     mlflow.log_param("n_params",net.count_params())
+    net.summary()
     return net
