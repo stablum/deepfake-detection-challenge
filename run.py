@@ -7,6 +7,7 @@ import mlflow
 import time
 import metrics
 import config
+import os
 
 def main():
     utils.log_config()
@@ -36,7 +37,10 @@ def train(net):
                 start = time.time()
                 history = net.fit(curr_slice,label, batch_size=1)
                 losses.append(history.history['loss'][0])
-                accuracies.append(history.history['accuracy'][0])
+                for k in ('accuracy','acc'):
+                    if k in history.history.keys():
+                        accuracies.append(history.history[k][0])
+                        break
                 end = time.time()
                 fit_time = end-start
                 print("elapsed time to fit:",fit_time)

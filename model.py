@@ -12,6 +12,12 @@ def create():
     net = Sequential()#add model layers
     first = True
     for i in range(config.conv_layers):
+        # increasing the number of features as the convolutional blocks get deeper
+        conv_features = int(
+            config.conv_features*(
+                (config.conv_features_depth_mul)**(i)
+            )
+        ) 
 
         if config.max_pool_first and first is True:
             kwargs = dict()
@@ -26,7 +32,7 @@ def create():
         if config.conv_separable:
             kernel_shapes = (
                 np.identity(3)
-                *(config.kernel_size-1) 
+                *(np.array(config.kernel_size)-1) 
                 + np.ones((3,3))
             ).astype('int32')
         else:
@@ -46,7 +52,7 @@ def create():
                     config.stride_xy
                 )
             
-            add_layer(net,Conv3D(config.conv_features, **kwargs))
+            add_layer(net,Conv3D(conv_features, **kwargs))
         add_layer(net,MaxPooling3D(pool_size=(
             config.max_pool_size_t, 
             config.max_pool_size_xy, 

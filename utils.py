@@ -22,8 +22,8 @@ def log_config():
 
 def log_net(net):
     pretty_net = net.to_json(indent=4)
-    structure_filename = tempfile.mkstemp(prefix="deepfake_net_structure",suffix=".txt")[1]
-    plot_filename= tempfile.mkstemp(prefix="deepfake_net_plot",suffix=".png")[1]
+    structure_filename = tempfile.mkstemp(prefix="deepfake_net_structure_",suffix=".txt")[1]
+    plot_filename= tempfile.mkstemp(prefix="deepfake_net_plot_",suffix=".png")[1]
     f = open(structure_filename,'w')
     f.write(pretty_net)
     f.flush()
@@ -33,11 +33,11 @@ def log_net(net):
         net,
         to_file=plot_filename,
         show_shapes=True,
-        show_layer_names=True,
-        expand_nested=True
+        show_layer_names=True
+        #expand_nested=True
     )
     mlflow.log_artifact(plot_filename)
-    summary_filename = tempfile.mkstemp(prefix="deepfake_net_summary",suffix=".txt")[1]
+    summary_filename = tempfile.mkstemp(prefix="deepfake_net_summary_",suffix=".txt")[1]
     f = open(summary_filename,'w')
     keras.utils.print_summary(net,print_fn=lambda line: f.write(line+'\n'))
     f.flush()
